@@ -1,0 +1,15 @@
+albumentations
+matplotlib
+monai
+notebook
+opencv-contrib-python
+patchify
+segmentation-models-pytorch
+Pillow
+scikit-learn
+wandb
+torchmetrics
+--extra-index-url https://download.pytorch.org/whl/cu118
+torch
+torchvision
+torchaudio
