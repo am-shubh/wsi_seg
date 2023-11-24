@@ -38,6 +38,14 @@
   python main.py
   ```
 
+### Observations:
+- By Analysing the data and its corresponding mask, I can feel there is a lot of ambiguity in labelling. I maybe wrong in this assumption since WSI is totally a new field for me. Here are some samples:
+![1](./patches_ambiguous/1.png)
+![2](./patches_ambiguous/2.png)
+![3](./patches_ambiguous/3.png)
+![4](./patches_ambiguous/4.png)
+![5](./patches_ambiguous/5.png)
+
 ### Results:
 - WandB Project link for accuracy and loss curves: https://wandb.ai/shubh19/exp?workspace=user-shubh19
 - Google Drive link for model weights, logs and Predictions: https://drive.google.com/drive/folders/1rPszBQuqHpFWpIAYKM0o6rJPHwdkPClc?usp=sharing
