@@ -1,122 +1,80 @@
-# wsi_seg
+# wsi_tf_seg
 
 ### Environment:
-- Cone this repo
-- Create Python 3.10.13 environment
+- Cone this repo and checkout to **wsi_tf** branch
+- Create Python 3.8.0 environment
   ```
-  conda create --name wsi_seg python=3.10
-  conda activate wsi_seg
+  conda create --name wsi_tf_seg python=3.8.0
+  conda activate wsi_tf_seg
   ```
 - Install Dependencies
   ```
   pip install -r requirements.txt
   ```
-- Copy the Dataset directory in the same folder and then change variables in config and constants file as per need.
+- Create a workspace directory and change the config as per requirements.
+- **NOTE**: You may need to downgrade "protobuf" as per tensorflow requirement. Check if tensorflow is able to access the GPU device:
+  ```
+  import tensorflow as tf
+  print(tf.config.list_physical_devices('GPU'))
+  ```
 
-### Work directory Explaination:
-- **config.json**: Stores params, hyper-params and other configs for the whole pipeline. Update this file accordingly before running your experiment.
-- **constants.py**: Stores most of the constant values for this problem statement. Change the experiment name directory accordingly.
-- **data.py**: Dataset and data loader definition.
-- **main.py**: main script to run the training, evaluation and inference.
-- **model.py**: Model architecture and compilation methods.
-- **pre_process.py**: Scripts to extract patches from WSI images.
-- **requirements.txt**: Lists packages/dependencies names for the environment.
-- **utils.py**: Contains Various utility files.
+### Work directory Explaination, Also shared via google drive(without dataset):
+- **Config/config.json**: Stores params, hyper-params and other configs for the whole pipeline. Update this file accordingly before running your experiment.
+- **Logs**: This store log for experiment as well as tensorboard log for visualization.
+- **Predictions**: This will store the prediction on valid images provided after model is trained by loading best weights.
+- **Weights/Trained**: This will store both best and latest model weight file.
 
 ### Approach:
-- Since WSI are huge in dimension so I have used *patchify* to create the patches of smaller size.
-- The train and validation images and masks were splitted into smaller patches. The validation unpatched images were also used for prediction in the last based on best model.
-- I have used pytorch and segmentation models library to train different models for this problem statement.
+- In the previous approach, I used pytorch and I was focussed on making sure the model learns pixel perfect features. But after a lot of experiment and data analysis, I have observed that even annotations are not pixel perfect in the ground truth, so I pivoted my approach to very basic models like vanilla Unet and making sure the data is properly feed into the model.
+- The decision to use tf in the second approach was basically to test whther I was doing anything wrong in terms of Data loaders in pytorch and whther models were learning proper features.
+- In TF, I have mostly focussed on writing custom data loader and making sure other components of pipeline are also configurable.
 
 ### Steps:
-- Create smaller patches. Update patch size in the config. I have tried with patch size of 256 and 512.
+- Create smaller patches with the same pre_process script.
   ```
   python pre_process.py
   ```
-- Run main script to perform training, evaluation and inference. This script creates a experiment directory based on the name specified in the constants.py file and then trains the models based on the params and hyper-params specified in the config.json file. This will save the latest and best model weights and also save the model predictions on two valid images provided.
+- In the workspace direcotry, Please check "Config/config.json" to update params and hyper-params as per need.
+- Run main script to perform training, evaluation and inference. Change the working directory path in semantic.py as per your local path at line 35: *self.path = "/home/rnd/Documents/backup/DL/exp/unet_512"*
   ```
   python main.py
   ```
-
-### Observations:
-- By Analysing the data and its corresponding mask, I can feel there is a lot of ambiguity in labelling. I maybe wrong in this assumption since WSI is totally a new field for me. Here are some samples:
-![1](./patches_ambiguous/1.png)
-![2](./patches_ambiguous/2.png)
-![3](./patches_ambiguous/3.png)
-![4](./patches_ambiguous/4.png)
-![5](./patches_ambiguous/5.png)
+- After suceessful completion of above command, please use tensorboard to visualize the logs:
+  ```
+  cd unet_512
+  tensorboard --logdir Logs/
+  ```
 
 ### Results:
-- WandB Project link for accuracy and loss curves: https://wandb.ai/shubh19/exp?workspace=user-shubh19
-- Google Drive link for model weights, logs and Predictions: https://drive.google.com/drive/folders/1rPszBQuqHpFWpIAYKM0o6rJPHwdkPClc?usp=sharing
+- Google Drive link for model weights, logs and Predictions: https://drive.google.com/drive/folders/1LBJBAHU-BHt6BxIspl_y8XTWxURw47Cp?usp=sharing
   
-- UNet with Resnet34 with LR scheduler and patch size = 512
+- Vanilla UNet and patch size = 512
     ```
-    Running Prediction for Test/Image/7105b8ee8d4c00c513b334fdfdcd6c49.png
-    Dice coefficient for class Black: 0.9930900643150197
-    Dice coefficient for class Yellow: 0.41872146620505857
-    Dice coefficient for class Red: 0.3816181222900247
-    Average Dice coefficient: 0.5978098842700343
+    Test/Image/7105b8ee8d4c00c513b334fdfdcd6c49.png
+    Dice coefficient for class Black: 0.9577465992110684
+    Dice coefficient for class Yellow: 0.7000214177439925
+    Dice coefficient for class Red: 0.7503046202049791
+    Average Dice coefficient: 0.8026908790533467
 
-    Running Prediction for Test/Image/d0cf594c5106fb84e894c0b12013f367.png
-    Dice coefficient for class Black: 0.9673794184824136
-    Dice coefficient for class Yellow: 0.5327590964151333
-    Dice coefficient for class Red: 0.7543495720963054
-    Average Dice coefficient: 0.7514960289979508
-    ```
-
-- FPN with Resnet34 and patch size = 512
-    ```
-    Running Prediction for Test/Image/7105b8ee8d4c00c513b334fdfdcd6c49.png
-    Dice coefficient for class Black: 0.9931033342601725
-    Dice coefficient for class Yellow: 0.5742875592859272
-    Dice coefficient for class Red: 0.43456890660454395
-    Average Dice coefficient: 0.6673199333835479
-
-    Running Prediction for Test/Image/d0cf594c5106fb84e894c0b12013f367.png
-    Dice coefficient for class Black: 0.9692450931760175
-    Dice coefficient for class Yellow: 0.5684065583394063
-    Dice coefficient for class Red: 0.7557470667546216
-    Average Dice coefficient: 0.7644662394233483
+    Test/Image/d0cf594c5106fb84e894c0b12013f367.png
+    Dice coefficient for class Black: 0.9315076414180564
+    Dice coefficient for class Yellow: 0.6543513431132717
+    Dice coefficient for class Red: 0.8117898093166862
+    Average Dice coefficient: 0.7992162646160047
     ```
 
-- UNet with Resnet18 without LR scheduler and patch size = 512
-    ```
-    Running Prediction for Test/Image/7105b8ee8d4c00c513b334fdfdcd6c49.png
-    Dice coefficient for class Black: 0.987933335585651
-    Dice coefficient for class Yellow: 0.49366078563947086
-    Dice coefficient for class Red: 0.4210110024759401
-    Average Dice coefficient: 0.634201707900354
-
-    Running Prediction for Test/Image/d0cf594c5106fb84e894c0b12013f367.png
-    Dice coefficient for class Black: 0.9631788424254311
-    Dice coefficient for class Yellow: 0.5651457952011617
-    Dice coefficient for class Red: 0.7642635364989824
-    Average Dice coefficient: 0.7641960580418584
-    ```
-
-- UNetPlus with Resnet34 and patch size = 256
-    ```
-    Running Prediction for Test/Image/7105b8ee8d4c00c513b334fdfdcd6c49.png
-
-    Dice coefficient for class Black: 0.9906353220541534
-    Dice coefficient for class Yellow: 0.49749753596106006
-    Dice coefficient for class Red: 0.411891092885325
-    Average Dice coefficient: 0.6333413169668461
-
-    Running Prediction for Test/Image/d0cf594c5106fb84e894c0b12013f367.png
-    Dice coefficient for class Black: 0.961001661053341
-    Dice coefficient for class Yellow: 0.5259151811798194
-    Dice coefficient for class Red: 0.7546168068268623
-    Average Dice coefficient: 0.7471778830200075
-    ```
+![F1_Score](./results/f1_scores.png)
+![Iou](./results/iou_scores.png)
+![Loss](./results/loss.png)
 
 ### Disclaimer & References:
 - I have used few open source codes and packages for the end-to-end implementation of this problem statement.
-- [Link](https://github.com/bnsreenu/python_for_microscopists/tree/master/228_semantic_segmentation_of_aerial_imagery_using_unet)
-- [Link](https://github.com/qubvel/segmentation_models.pytorch/tree/master)
+- [Link](https://github.com/bnsreenu/python_for_microscopists/blob/master/208-simple_multi_unet_model.py)
 
 ### Scope of Improvement:
 - Following paper can be explored and other custom or open source models can be used for improved results.
 - [Paperswithcode](https://paperswithcode.com/search?q_meta=&q_type=&q=Segment+Breast+Biopsy+Whole+Slide+Images)
 - [Paper](https://arxiv.org/pdf/1709.02554v2.pdf)
+- Other simple models can be used like LinkNet, SegNet or Hovernet.
+- Specifically, I have seen a lot of people using Hovernet to develop models for WSI.
+- Other simple approach can be to use multi scale resolution patch extraction and training vanilla UNET models.
