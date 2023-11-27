@@ -66,6 +66,8 @@
 ![F1_Score](./results/f1_scores.png)
 ![Iou](./results/iou_scores.png)
 ![Loss](./results/loss.png)
+![Prediction1](./results/prediction1.png)
+![Prediction2](./results/prediction2.png)
 
 ### Disclaimer & References:
 - I have used few open source codes and packages for the end-to-end implementation of this problem statement.
