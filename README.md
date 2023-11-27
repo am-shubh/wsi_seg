@@ -66,6 +66,7 @@
 ![F1_Score](./results/f1_scores.png)
 ![Iou](./results/iou_scores.png)
 ![Loss](./results/loss.png)
+\
 **Ground-truth(Left) & Prediction(Right)**
 ![Prediction1](./results/prediction1.png)
 **Ground-truth(Left) & Prediction(Right)**
