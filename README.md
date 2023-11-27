@@ -25,9 +25,9 @@
 - **Weights/Trained**: This will store both best and latest model weight file.
 
 ### Approach:
-- In the previous approach, I used pytorch and I was focussed on making sure the model learns pixel perfect features. But after a lot of experiment and data analysis, I have observed that even annotations are not pixel perfect in the ground truth, so I pivoted my approach to very basic models like vanilla Unet and making sure the data is properly feed into the model.
-- The decision to use tf in the second approach was basically to test whther I was doing anything wrong in terms of Data loaders in pytorch and whther models were learning proper features.
-- In TF, I have mostly focussed on writing custom data loader and making sure other components of pipeline are also configurable.
+- In the previous approach, I used pytorch and I was focussed on making sure the model learns pixel perfect features. But after a lot of experiment and data analysis, I have observed that even annotations are not pixel perfect in the ground truth, so I pivoted my approach to very basic models like vanilla Unet, which can be generic enough to localise the ROI, and  also making sure the data is properly feed into the model.
+- The decision to use tf in the second approach was basically to test whther I was doing anything wrong in terms of Data loaders in pytorch and whether models were learning proper features.
+- In TF, I have mostly focussed on writing custom data loader, pre-processing data in correct format and making sure other components of pipeline are also configurable.
 
 ### Steps:
 - Create smaller patches with the same pre_process script.
@@ -66,7 +66,9 @@
 ![F1_Score](./results/f1_scores.png)
 ![Iou](./results/iou_scores.png)
 ![Loss](./results/loss.png)
+**Ground-truth(Left) & Prediction(Right)**
 ![Prediction1](./results/prediction1.png)
+**Ground-truth(Left) & Prediction(Right)**
 ![Prediction2](./results/prediction2.png)
 
 ### Disclaimer & References:
